@@ -1,7 +1,6 @@
 import pandas as pd
 with open(r'D:\python_work\report.txt',encoding='utf-8') as f:
     data=f.readlines()
-
 data1=[(i.strip()).split()  for i in data]
 #print(data1)
 data_head=data1[0]
@@ -17,7 +16,6 @@ for i in datas:
         avg=sums/len(score)
     i.append(sums)
     i.append(avg)
-
 #print(datas)
 #print(data_head)
 datas.sort(key=lambda x:x[10],reverse=True)
