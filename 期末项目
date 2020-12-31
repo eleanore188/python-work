@@ -1,0 +1,50 @@
+import re
+import requests
+
+def guess_number():
+    point=requests.get('https://python666.cn/cls/number/guess/',headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'})
+    number=int(point.text)
+    #print(number)
+    rounds=0
+    while True:
+        num1=input('请猜一个1-100的数字：')
+        if re.match(r"[1-9][0-9]?$|100", num1):
+            rounds+=1
+            num=int(num1)
+            if num>number:
+                print('太大了，再试试')
+            elif num<number:
+                print('太小了，再试试')
+            else:
+                print('猜对了，你一共猜了%d轮'%rounds)
+                break
+        else:
+            print('输入有误，请输入1-100的数字')
+
+def openfile():
+    with open('game_score.txt','w+') as f:
+        list1=f.readlines()
+        print(list1)
+        dict1={}
+        for i in list1:
+            list2=i.split()
+            dict1[list2[0]]=list2[1:]
+        return dict1
+def match_username():
+    username=input('请输入你的名字(两位及以上中文下划线数字英语，开头不能是数字)：')
+    if re.match(r'[\u4e00-\u9fa5a-zA-Z_]\w+',username):
+        dict_name=openfile()
+        data=dict_name.get(username)
+        if data:
+            times=data[0]
+            min_round=data[1]
+            avg_round=data[2]
+            print('%s,你已经玩了%d次，最少%d轮猜出答案，平均%.2f轮猜出答案'%(times,min_round,avg_round))
+        else:
+            times=0
+            min_round=0
+            avg_round=0
+            print('%s,你已经玩了%d次，最少%d轮猜出答案，平均%.2f轮猜出答案'%(times,min_round,avg_round))
+    else:
+        print('用户名格式有误，请重新输入')
+match_username()        
