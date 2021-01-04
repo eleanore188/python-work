@@ -17,34 +17,61 @@ def guess_number():
                 print('太小了，再试试')
             else:
                 print('猜对了，你一共猜了%d轮'%rounds)
-                break
+                return rounds
         else:
             print('输入有误，请输入1-100的数字')
 
 def openfile():
     with open('game_score.txt','w+') as f:
         list1=f.readlines()
-        print(list1)
+        #print(list1)
         dict1={}
         for i in list1:
             list2=i.split()
             dict1[list2[0]]=list2[1:]
         return dict1
 def match_username():
-    username=input('请输入你的名字(两位及以上中文下划线数字英语，开头不能是数字)：')
+    username=input('请输入你的名字(两位及以上中文字母数字下划线，开头不能是数字)：')
     if re.match(r'[\u4e00-\u9fa5a-zA-Z_]\w+',username):
         dict_name=openfile()
         data=dict_name.get(username)
         if data:
             times=data[0]
             min_round=data[1]
-            avg_round=data[2]
-            print('%s,你已经玩了%d次，最少%d轮猜出答案，平均%.2f轮猜出答案'%(times,min_round,avg_round))
+            total_rounds=data[2]
         else:
             times=0
             min_round=0
+            total_rounds=0
+            dict_name[username]=[times,min_round,total_rounds]#新建一条记录
+        if times==0:
             avg_round=0
-            print('%s,你已经玩了%d次，最少%d轮猜出答案，平均%.2f轮猜出答案'%(times,min_round,avg_round))
+        else:
+            avg_round=total_rounds/times
+        print('%s,你已经玩了%d次，最少%d轮猜出答案，平均%.2f轮猜出答案，开始游戏！'%(username,times,min_round,avg_round))
+        return (dict_name,username)    
     else:
         print('用户名格式有误，请重新输入')
-match_username()        
+        return 'restart'
+
+def play_game(dict_data):
+    username=dict_data[1]
+    times=dict_data[0].get(username)[0]
+    min_round=dict_data[0].get(username)[1]
+    total_rounds=dict_data[0].get(username)[2]
+    while True:
+        rounds=guess_number()
+        times+=1
+        total_rounds+=rounds
+        if min_round==0 or min_round>=rounds:
+            min_round=rounds 
+        print('%s,你已经玩了%d次，最少%d轮猜出答案，平均%.2f轮猜出答案'%(username,times,min_round,total_rounds/times))  
+        symbol=input('是否继续游戏，输入y继续，其他退出：')
+        if symbol!='y':
+            print('退出游戏，欢迎下次再来！')
+            break
+dict_1=match_username()
+
+while dict_1=='restart':
+    dict_1=match_username()
+play_game(dict_1)
