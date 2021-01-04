@@ -1,0 +1,85 @@
+import re
+import requests
+import os 
+def guess_number():
+    point=requests.get('https://python666.cn/cls/number/guess/',headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'})
+    number=int(point.text)
+    #print(number)
+    rounds=0
+    while True:
+        num1=input('请猜一个1-100的数字：')
+        if re.match(r"[1-9][0-9]?$|100", num1):
+            rounds+=1
+            num=int(num1)
+            if num>number:
+                print('太大了，再试试')
+            elif num<number:
+                print('太小了，再试试')
+            else:
+                print('猜对了，你一共猜了%d轮'%rounds)
+                return rounds
+        else:
+            print('输入有误，请输入1-100的数字')
+
+def openfile():
+    filename='game_score.txt'
+    if os.path.exists(filename):
+        option='r'
+    else:
+        option='w+'
+    with open(filename,option) as f:
+        list1=f.readlines()
+        #print(list1)
+        dict1={}
+        for i in list1:
+            list2=i.split()
+            dict1[list2[0]]=list2[1:]
+        return dict1
+def match_username():
+    username=input('请输入你的名字(两位及以上中文字母数字下划线，开头不能是数字)：')
+    if re.match(r'[\u4e00-\u9fa5a-zA-Z_]\w+',username):
+        return username
+    else:
+        print('用户名格式有误，请重新输入')
+
+def play_game(username):
+    dict_name=openfile()
+    data=dict_name.get(username)
+    if data:
+        times=data[0]
+        min_round=data[1]
+        total_rounds=data[2]
+    else:
+        times=0
+        min_round=0
+        total_rounds=0
+    if times==0:
+        avg_round=0
+    else:
+        avg_round=total_rounds/times
+    print('%s,你已经玩了%d次，最少%d轮猜出答案，平均%.2f轮猜出答案，开始游戏！'%(username,times,min_round,avg_round))
+    while True:
+        rounds=guess_number()
+        times+=1
+        total_rounds+=rounds
+        if min_round==0 or min_round>=rounds:
+            min_round=rounds 
+        print('%s,你已经玩了%d次，最少%d轮猜出答案，平均%.2f轮猜出答案'%(username,times,min_round,total_rounds/times))  
+        symbol=input('是否继续游戏，输入y继续，其他退出：')
+        if symbol!='y':
+            print('退出游戏，欢迎下次再来！')
+            break
+    dict_name[username]=[times,min_round,total_rounds]#新建一条记录
+    return dict_name
+def write_file(dict_data):
+    with open('game_score.txt','w+') as f:
+        for i in dict_data:
+            dict_data[i]=[str(dict_data[i][0]),str(dict_data[i][1]),str(dict_data[i][2])]
+            line=i+' '+' '.join(dict_data.get(i))+'\n'
+            f.write(line)
+            
+name=match_username()
+while name==None:
+    name=match_username()
+dict_data1=play_game(name)
+write_file(dict_data1)
