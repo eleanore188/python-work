@@ -46,9 +46,9 @@ def play_game(username):
     dict_name=openfile()
     data=dict_name.get(username)
     if data:
-        times=data[0]
-        min_round=data[1]
-        total_rounds=data[2]
+        times=int(data[0])
+        min_round=int(data[1])
+        total_rounds=int(data[2])
     else:
         times=0
         min_round=0
